@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commission Queue & Status</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.8.0.3 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;th&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Commission Queue &amp; Status&lt;/title&gt;
+    &lt;link href=&quot;https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+    &lt;style&gt;
         :root {
             --bg-color: #fcf6f9;
             --card-bg: #ffffff;
@@ -81,74 +95,76 @@
             color: #aaa;
             margin-top: 50px;
         }
-    </style>
-</head>
-<body>
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
 
-<div class="container">
-    <header>
-        <h1>🌙 Commission Queue Status</h1>
-        <p>สถานะคิวงานและรายละเอียดคอมมิชชันของคุณ</p>
-        <div id="summary-box" class="status-badge">กำลังโหลดข้อมูลภาพรวม...</div>
-    </header>
+&lt;div class=&quot;container&quot;&gt;
+    &lt;header&gt;
+        &lt;h1&gt;🌙 Commission Queue Status&lt;/h1&gt;
+        &lt;p&gt;<span lang="hi-IN">สถานะคิวงานและรายละเอียดคอมมิชชันของคุณ</span>&lt;/p&gt;
+        &lt;div id=&quot;summary-box&quot; class=&quot;status-badge&quot;&gt;<span lang="hi-IN">กำลังโหลดข้อมูลภาพรวม</span>...&lt;/div&gt;
+    &lt;/header&gt;
 
-    <div id="queue-list">
-        <div class="loading">กำลังดึงข้อมูลจาก Google Sheets... ✨</div>
-    </div>
-</div>
+    &lt;div id=&quot;queue-list&quot;&gt;
+        &lt;div class=&quot;loading&quot;&gt;<span lang="hi-IN">กำลังดึงข้อมูลจาก </span>Google Sheets... ✨&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
 
-<script>
-    // 🔗 แทนที่ลิงก์ด้านล่างด้วย Web App URL ที่ได้จาก Google Apps Script ของคุณ
-    const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+&lt;script&gt;
+    // 🔗 <span lang="hi-IN">แทนที่ลิงก์ด้านล่างด้วย </span>Web App URL <span lang="hi-IN">ที่ได้จาก </span>Google Apps Script <span lang="hi-IN">ของคุณ</span>
+    const WEB_APP_URL = 'https://docs.google.com/spreadsheets/d/1tREndRnvKsYMJtaNzpyj5SrEGu9vKQgG9aWo9vdy7qw/edit?usp=drivesdk';
 
     async function loadQueueData() {
         try {
             const response = await fetch(WEB_APP_URL);
             const data = await response.json();
             
-            // แสดงผลภาพรวม
-            document.getElementById('summary-box').innerText = `ความคืบหน้าภาพรวม: ${data.summary}`;
+            // <span lang="hi-IN">แสดงผลภาพรวม</span>
+            document.getElementById('summary-box').innerText = `<span lang="hi-IN">ความคืบหน้าภาพรวม</span>: ${data.summary}`;
 
             const listContainer = document.getElementById('queue-list');
             listContainer.innerHTML = '';
 
             if (data.queues.length === 0) {
-                listContainer.innerHTML = '<p style="text-align:center;">ยังไม่มีรายการคิวในขณะนี้</p>';
+                listContainer.innerHTML = '&lt;p style=&quot;text-align:center;&quot;&gt;<span lang="hi-IN">ยังไม่มีรายการคิวในขณะนี้</span>&lt;/p&gt;';
                 return;
             }
 
-            // วนลูปสร้างการ์ดแสดงผลทีละคิว
-            data.queues.forEach((item, index) => {
+            // <span lang="hi-IN">วนลูปสร้างการ์ดแสดงผลทีละคิว</span>
+            data.queues.forEach((item, index) =&gt; {
                 let badgeClass = 'pending';
-                let statusText = item.status || 'กำลังดำเนินการ';
+                let statusText = item.status || '<span lang="hi-IN">กำลังดำเนินการ</span>';
                 
-                if (item.status === 'เสร็จสิ้น') {
+                if (item.status === '<span lang="hi-IN">เสร็จสิ้น</span>') {
                     badgeClass = 'done';
                 }
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="client-info">
-                        <h3>#${index + 1} - ${item.name} (${item.platform || 'N/A'})</h3>
-                        <p>แพ็กเกจ: ${item.type || '-'} | ขนาด: ${item.size || '-'}</p>
-                        <p style="font-size: 0.8rem; color: #aaa; margin-top: 4px;">การชำระเงิน: ${item.payment || 'รอชำระ'}</p>
-                    </div>
-                    <div>
-                        <span class="badge ${badgeClass}">${statusText}</span>
-                    </div>
+                    &lt;div class=&quot;client-info&quot;&gt;
+                        &lt;h3&gt;#${index + 1} - ${item.name} (${item.platform || 'N/A'})&lt;/h3&gt;
+                        &lt;p&gt;<span lang="hi-IN">แพ็กเกจ</span>: ${item.type || '-'} | <span lang="hi-IN">ขนาด</span>: ${item.size || '-'}&lt;/p&gt;
+                        &lt;p style=&quot;font-size: 0.8rem; color: #aaa; margin-top: 4px;&quot;&gt;<span lang="hi-IN">การชำระเงิน</span>: ${item.payment || '<span lang="hi-IN">รอชำระ</span>'}&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div&gt;
+                        &lt;span class=&quot;badge ${badgeClass}&quot;&gt;${statusText}&lt;/span&gt;
+                    &lt;/div&gt;
                 `;
                 listContainer.appendChild(card);
             });
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            document.getElementById('queue-list').innerHTML = '<p style="text-align:center; color: red;">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบลิงก์ Web App อีกครั้ง</p>';
+            document.getElementById('queue-list').innerHTML = '&lt;p style=&quot;text-align:center; color: red;&quot;&gt;<span lang="hi-IN">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบลิงก์ </span>Web App <span lang="hi-IN">อีกครั้ง</span>&lt;/p&gt;';
         }
     }
 
     loadQueueData();
-</script>
+&lt;/script&gt;
 
+&lt;/body&gt;
+&lt;/html&gt;</pre>
 </body>
 </html>
