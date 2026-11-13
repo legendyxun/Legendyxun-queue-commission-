@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Queue & Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fcf6f9;
+            --card-bg: #ffffff;
+            --primary-color: #ffb7b2;
+            --text-color: #555555;
+            --heading-color: #4a403a;
+            --accent: #ff9aa2;
+            --success: #b5ead7;
+            --warning: #ffdac1;
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--heading-color);
+            margin-bottom: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            background-color: var(--warning);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: #d97706;
+            margin-top: 10px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .client-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--heading-color);
+        }
+        .client-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .badge {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge.done { background-color: var(--success); color: #065f46; }
+        .badge.pending { background-color: var(--warning); color: #9a3412; }
+        .loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🌙 Commission Queue Status</h1>
+        <p>สถานะคิวงานและรายละเอียดคอมมิชชันของคุณ</p>
+        <div id="summary-box" class="status-badge">กำลังโหลดข้อมูลภาพรวม...</div>
+    </header>
+
+    <div id="queue-list">
+        <div class="loading">กำลังดึงข้อมูลจาก Google Sheets... ✨</div>
+    </div>
+</div>
+
+<script>
+    // 🔗 แทนที่ลิงก์ด้านล่างด้วย Web App URL ที่ได้จาก Google Apps Script ของคุณ
+    const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+
+    async function loadQueueData() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            const data = await response.json();
+            
+            // แสดงผลภาพรวม
+            document.getElementById('summary-box').innerText = `ความคืบหน้าภาพรวม: ${data.summary}`;
+
+            const listContainer = document.getElementById('queue-list');
+            listContainer.innerHTML = '';
+
+            if (data.queues.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center;">ยังไม่มีรายการคิวในขณะนี้</p>';
+                return;
+            }
+
+            // วนลูปสร้างการ์ดแสดงผลทีละคิว
+            data.queues.forEach((item, index) => {
+                let badgeClass = 'pending';
+                let statusText = item.status || 'กำลังดำเนินการ';
+                
+                if (item.status === 'เสร็จสิ้น') {
+                    badgeClass = 'done';
+                }
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="client-info">
+                        <h3>#${index + 1} - ${item.name} (${item.platform || 'N/A'})</h3>
+                        <p>แพ็กเกจ: ${item.type || '-'} | ขนาด: ${item.size || '-'}</p>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-top: 4px;">การชำระเงิน: ${item.payment || 'รอชำระ'}</p>
+                    </div>
+                    <div>
+                        <span class="badge ${badgeClass}">${statusText}</span>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('queue-list').innerHTML = '<p style="text-align:center; color: red;">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบลิงก์ Web App อีกครั้ง</p>';
+        }
+    }
+
+    loadQueueData();
+</script>
+
+</body>
+</html>
