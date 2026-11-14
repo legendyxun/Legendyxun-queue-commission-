@@ -1,170 +1,93 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="th">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title></title>
-	<meta name="generator" content="LibreOffice 26.8.0.3 (Linux)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="00:00:00"/>
-	<style type="text/css">
-		@page { size: 8.27in 11.69in; margin: 0.79in }
-		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
-		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
-	</style>
-</head>
-<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;th&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;Commission Queue &amp; Status&lt;/title&gt;
-    &lt;link href=&quot;https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
-    &lt;style&gt;
-        :root {
-            --bg-color: #fcf6f9;
-            --card-bg: #ffffff;
-            --primary-color: #ffb7b2;
-            --text-color: #555555;
-            --heading-color: #4a403a;
-            --accent: #ff9aa2;
-            --success: #b5ead7;
-            --warning: #ffdac1;
-        }
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        h1 {
-            color: var(--heading-color);
-            margin-bottom: 5px;
-        }
-        .status-badge {
-            display: inline-block;
-            background-color: var(--warning);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 500;
-            color: #d97706;
-            margin-top: 10px;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        .client-info h3 {
-            margin: 0 0 5px 0;
-            color: var(--heading-color);
-        }
-        .client-info p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #888;
-        }
-        .badge {
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        .badge.done { background-color: var(--success); color: #065f46; }
-        .badge.pending { background-color: var(--warning); color: #9a3412; }
-        .loading {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #aaa;
-            margin-top: 50px;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-
-&lt;div class=&quot;container&quot;&gt;
-    &lt;header&gt;
-        &lt;h1&gt;🌙 Commission Queue Status&lt;/h1&gt;
-        &lt;p&gt;<span lang="hi-IN">สถานะคิวงานและรายละเอียดคอมมิชชันของคุณ</span>&lt;/p&gt;
-        &lt;div id=&quot;summary-box&quot; class=&quot;status-badge&quot;&gt;<span lang="hi-IN">กำลังโหลดข้อมูลภาพรวม</span>...&lt;/div&gt;
-    &lt;/header&gt;
-
-    &lt;div id=&quot;queue-list&quot;&gt;
-        &lt;div class=&quot;loading&quot;&gt;<span lang="hi-IN">กำลังดึงข้อมูลจาก </span>Google Sheets... ✨&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;script&gt;
-    // 🔗 <span lang="hi-IN">แทนที่ลิงก์ด้านล่างด้วย </span>Web App URL <span lang="hi-IN">ที่ได้จาก </span>Google Apps Script <span lang="hi-IN">ของคุณ</span>
-    const WEB_APP_URL = 'https://docs.google.com/spreadsheets/d/1tREndRnvKsYMJtaNzpyj5SrEGu9vKQgG9aWo9vdy7qw/edit?usp=drivesdk';
-
-    async function loadQueueData() {
-        try {
-            const response = await fetch(WEB_APP_URL);
-            const data = await response.json();
-            
-            // <span lang="hi-IN">แสดงผลภาพรวม</span>
-            document.getElementById('summary-box').innerText = `<span lang="hi-IN">ความคืบหน้าภาพรวม</span>: ${data.summary}`;
-
-            const listContainer = document.getElementById('queue-list');
-            listContainer.innerHTML = '';
-
-            if (data.queues.length === 0) {
-                listContainer.innerHTML = '&lt;p style=&quot;text-align:center;&quot;&gt;<span lang="hi-IN">ยังไม่มีรายการคิวในขณะนี้</span>&lt;/p&gt;';
-                return;
-            }
-
-            // <span lang="hi-IN">วนลูปสร้างการ์ดแสดงผลทีละคิว</span>
-            data.queues.forEach((item, index) =&gt; {
-                let badgeClass = 'pending';
-                let statusText = item.status || '<span lang="hi-IN">กำลังดำเนินการ</span>';
-                
-                if (item.status === '<span lang="hi-IN">เสร็จสิ้น</span>') {
-                    badgeClass = 'done';
-                }
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    &lt;div class=&quot;client-info&quot;&gt;
-                        &lt;h3&gt;#${index + 1} - ${item.name} (${item.platform || 'N/A'})&lt;/h3&gt;
-                        &lt;p&gt;<span lang="hi-IN">แพ็กเกจ</span>: ${item.type || '-'} | <span lang="hi-IN">ขนาด</span>: ${item.size || '-'}&lt;/p&gt;
-                        &lt;p style=&quot;font-size: 0.8rem; color: #aaa; margin-top: 4px;&quot;&gt;<span lang="hi-IN">การชำระเงิน</span>: ${item.payment || '<span lang="hi-IN">รอชำระ</span>'}&lt;/p&gt;
-                    &lt;/div&gt;
-                    &lt;div&gt;
-                        &lt;span class=&quot;badge ${badgeClass}&quot;&gt;${statusText}&lt;/span&gt;
-                    &lt;/div&gt;
-                `;
-                listContainer.appendChild(card);
-            });
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            document.getElementById('queue-list').innerHTML = '&lt;p style=&quot;text-align:center; color: red;&quot;&gt;<span lang="hi-IN">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบลิงก์ </span>Web App <span lang="hi-IN">อีกครั้ง</span>&lt;/p&gt;';
-        }
-    }
-
-    loadQueueData();
-&lt;/script&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commission Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#101116;--panel:#191b24;--panel2:#20232e;--line:#303442;--text:#f1f0f7;--muted:#999cac;--accent:#a88be8;--mint:#6fc6b1;--gold:#d9ae72;--red:#e58c9a;--blue:#82a9e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 Prompt,system-ui,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:1440px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.brand{font-size:22px;font-weight:700}.sub,.muted,.tiny{color:var(--muted)}.sub,.tiny{font-size:12px}.actions,.nav,.toolbar{display:flex;gap:8px;flex-wrap:wrap}.btn,.nav button{border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:9px 13px}.btn.primary{background:var(--accent);color:#171321;border-color:var(--accent);font-weight:700}.btn.danger{color:var(--red)}.nav{margin-bottom:18px}.nav button{background:transparent;color:var(--muted)}.nav button.active{background:#2b263a;border-color:#7e69ad;color:#e8ddff}.view{display:none}.view.active{display:block}.grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px}.statlabel{font-size:12px;color:var(--muted)}.stat{font-size:25px;font-weight:700;margin:5px 0}.cols{grid-template-columns:1.2fr .8fr}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.sectionhead h2{font-size:15px;margin:0}.toolbar{margin:12px 0}.toolbar input,.toolbar select,.field input,.field select,.field textarea,.config input{background:#11131a;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 10px}.toolbar input{flex:1;min-width:190px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;min-width:1080px;font-size:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}th{color:var(--muted);background:#20222c;position:sticky;top:0}tr:last-child td{border:0}.tag{display:inline-block;padding:3px 8px;border:1px solid var(--line);border-radius:20px;font-size:11px;white-space:nowrap}.done{color:var(--mint)}.working{color:var(--blue)}.revision{color:var(--gold)}.empty{padding:35px;text-align:center;color:var(--muted)}.bar{height:7px;background:#2b2e3a;border-radius:8px;overflow:hidden;margin:8px 0}.bar span{display:block;height:100%;background:var(--mint)}.metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}.metric:last-child{border:0}.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modal.open{display:flex}.dialog{width:min(900px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%}.field textarea{min-height:68px}.full{grid-column:1/-1}.checkrow{display:flex;gap:15px;flex-wrap:wrap}.checkrow label{display:flex;align-items:center;gap:6px}.formactions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.login{max-width:460px;margin:7vh auto}.config{display:grid;gap:10px}.notice{border:1px solid #66543c;background:#29251e;color:#e6c58d;padding:11px;border-radius:9px;font-size:12px}.status{font-size:12px;color:var(--muted);margin-top:10px}.hidden{display:none!important}
+@media(max-width:800px){.app{padding:14px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}}
+@media(max-width:520px){.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.stat{font-size:21px}}
+</style></head>
+<body>
+<section id="setup" class="login card">
+  <div class="brand">✦ Commission Studio</div><p class="sub">DARK STUDIO · PRIVATE WORKSPACE</p>
+  <div class="notice">เชื่อมต่อ Supabase เพื่อเปิดใช้งานระบบออนไลน์ ข้อมูลการเชื่อมต่อจะถูกเก็บไว้ในเบราว์เซอร์นี้เท่านั้น ใช้เฉพาะ Project URL และ anon/publishable key ห้ามใส่ service_role key</div>
+  <div class="config">
+    <div class="field"><label>Supabase Project URL</label><input id="projectUrl" placeholder="https://your-project.supabase.co"></div>
+    <div class="field"><label>Supabase anon / publishable key</label><input id="anonKey" placeholder="eyJ..."></div>
+    <button class="btn primary" id="connect">เชื่อมต่อโปรเจกต์</button>
+  </div><div id="setupMsg" class="status"></div>
+</section>
+<section id="login" class="login card hidden">
+  <div class="brand">✦ Commission Studio</div><p class="sub">เข้าสู่ระบบเจ้าของสตูดิโอ</p>
+  <div class="config"><div class="field"><label>อีเมล</label><input id="email" type="email" autocomplete="username"></div><div class="field"><label>รหัสผ่าน</label><input id="password" type="password" autocomplete="current-password"></div><button class="btn primary" id="signIn">เข้าสู่ระบบ</button><button class="btn" id="changeConfig">เปลี่ยนการเชื่อมต่อ</button></div><div id="loginMsg" class="status"></div>
+</section>
+<main id="workspace" class="app hidden">
+<header class="top"><div><div class="brand">✦ Commission Studio</div><div class="sub">DARK STUDIO · QUEUE / FINANCE / USAGE RIGHTS</div></div><div class="actions"><button class="btn" id="settings">ตั้งค่าการเชื่อมต่อ</button><button class="btn" id="logout">ออกจากระบบ</button><button class="btn primary" id="add">＋ เพิ่มคิวงาน</button></div></header>
+<nav class="nav"><button class="active" data-tab="overview">Overview</button><button data-tab="queue">Commission Queue</button><button data-tab="finance">Finance Analytics</button><button data-tab="rights">Usage & Copyright</button></nav>
+<section id="overview" class="view active">
+<div class="grid stats"><div class="card"><div class="statlabel">คิวทั้งหมด</div><div class="stat" id="total">0</div><div class="tiny">รายการในฐานข้อมูลส่วนตัว</div></div><div class="card"><div class="statlabel">ยอดชำระที่บันทึก</div><div class="stat" id="paidTotal">฿0</div><div class="tiny">ยอดในช่อง “ชำระแล้ว”</div></div><div class="card"><div class="statlabel">มูลค่าราคาที่ระบุ</div><div class="stat" id="priceTotal">฿0</div><div class="tiny">ไม่รวมรายการที่ไม่ระบุราคา</div></div><div class="card"><div class="statlabel">ราคาไม่ครบ</div><div class="stat" id="missingTotal">0</div><div class="tiny">รายการที่ยังไม่ระบุราคา</div></div></div>
+<div class="grid cols"><div class="panel"><div class="sectionhead"><h2>สถานะงาน</h2></div><div id="statusSummary"></div></div><div class="panel"><div class="sectionhead"><h2>ความคืบหน้าของงาน</h2></div><div id="progressSummary"></div><p class="tiny">ร่าง / เส้น / สี อิงตามข้อมูลที่บันทึกไว้</p></div></div>
+<div class="panel" style="margin-top:12px"><div class="sectionhead"><h2>คิวล่าสุด</h2><button class="btn" data-tab-link="queue">ดูคิวทั้งหมด →</button></div><div id="recent"></div></div>
+</section>
+<section id="queue" class="view"><div class="sectionhead"><div><h2>Commission Queue</h2><div class="tiny">ข้อมูลลูกค้าและรายละเอียดคอมมิชชัน</div></div><button class="btn primary" id="add2">＋ เพิ่มคิวงาน</button></div>
+<div class="toolbar"><input id="search" placeholder="ค้นหาชื่อลูกค้า / ช่องทาง / หมายเหตุ"><select id="filterStatus"><option value="">ทุกสถานะ</option><option>เสร็จสิ้น</option><option>กำลังดำเนินการ</option><option>รอบรีฟงาน</option></select><select id="filterUsage"><option value="">ทุกสิทธิ์การใช้งาน</option><option>ส่วนตัว</option><option>เชิงพาณิชย์</option><option value="__empty">ยังไม่ระบุ</option></select></div>
+<div class="tablewrap"><table><thead><tr><th>เดือน</th><th>ลูกค้า</th><th>ช่องทาง</th><th>สถานะ</th><th>Progress</th><th>ชำระ</th><th>ประเภท</th><th>สเกล</th><th>ตัวละคร</th><th>ราคา</th><th>ชำระแล้ว</th><th>สิทธิ์</th><th>ตัวอย่าง</th><th>เครดิต</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="rows"></tbody></table></div><p class="tiny">ข้อมูลที่ไม่ได้ระบุจะคงเป็นค่าว่าง ไม่เติมข้อมูลแทนให้เอง</p>
+</section>
+<section id="finance" class="view"><div class="sectionhead"><div><h2>Finance Analytics</h2><div class="tiny">สรุปจากราคากับยอดชำระที่บันทึกไว้</div></div></div><div class="grid stats"><div class="card"><div class="statlabel">ยอดชำระสะสม</div><div class="stat" id="fPaid">฿0</div></div><div class="card"><div class="statlabel">ยอดราคาที่ระบุ</div><div class="stat" id="fPrice">฿0</div></div><div class="card"><div class="statlabel">ราคาไม่ครบ</div><div class="stat" id="fMissing">0</div></div><div class="card"><div class="statlabel">ชำระมากกว่าราคาที่ระบุ</div><div class="stat" id="fOver">0</div></div></div><div class="grid cols" style="margin-top:12px"><div class="panel"><h2>แยกตามประเภทงาน</h2><div id="byType"></div></div><div class="panel"><h2>แยกตามสิทธิ์ใช้งาน</h2><div id="byUsage"></div></div><div class="panel"><h2>แยกตามสถานะชำระ</h2><div id="byPayment"></div></div><div class="panel"><h2>แยกตามเดือน</h2><div id="byMonth"></div></div></div><p class="tiny">ยอดชำระสะสมไม่ใช่กำไรสุทธิ และรายการที่ชำระมากกว่าราคาที่ระบุจะแสดงตามข้อมูลต้นฉบับโดยไม่ปรับแก้</p></section>
+<section id="rights" class="view"><div class="sectionhead"><div><h2>Usage & Copyright</h2><div class="tiny">ติดตามสิทธิ์การใช้งานและการอนุญาตนำผลงานไปแสดงตัวอย่าง</div></div></div><div class="grid stats"><div class="card"><div class="statlabel">ส่วนตัว</div><div class="stat" id="privateCount">0</div></div><div class="card"><div class="statlabel">เชิงพาณิชย์</div><div class="stat" id="commercialCount">0</div></div><div class="card"><div class="statlabel">ยังไม่ระบุสิทธิ์</div><div class="stat" id="unknownUsage">0</div></div><div class="card"><div class="statlabel">ตัวอย่างผลงานยังไม่ระบุ</div><div class="stat" id="unknownSample">0</div></div></div><div class="panel"><div id="rightsRows"></div></div></section>
+<div id="editor" class="modal"><div class="dialog"><div class="sectionhead"><h2 id="editorTitle">เพิ่มคิวงาน</h2><button class="btn" id="closeEditor">ปิด</button></div><form id="jobForm"><div class="formgrid">
+<div class="field"><label>เดือน</label><input name="month"></div><div class="field"><label>ชื่อลูกค้า</label><input name="client" required></div><div class="field"><label>ช่องทางติดต่อ</label><input name="contact"></div>
+<div class="field"><label>สถานะ</label><select name="status"><option value="">ยังไม่ระบุ</option><option>กำลังดำเนินการ</option><option>รอบรีฟงาน</option><option>เสร็จสิ้น</option></select></div><div class="field"><label>การชำระเงิน</label><select name="payment"><option value="">ยังไม่ระบุ</option><option>ชำระมัดจำ</option><option>ชำระแล้ว</option><option>รอชำระ</option></select></div><div class="field"><label>ประเภท</label><input name="type"></div>
+<div class="field"><label>สเกล</label><input name="scale"></div><div class="field"><label>จำนวนตัวละคร</label><input name="characters" type="number" step="any"></div><div class="field"><label>ราคา (บาท)</label><input name="price" type="number" step="any"></div><div class="field"><label>ชำระแล้ว (บาท)</label><input name="paid" type="number" step="any"></div><div class="field"><label>การใช้งาน</label><select name="usage"><option value="">ยังไม่ระบุ</option><option>ส่วนตัว</option><option>เชิงพาณิชย์</option></select></div><div class="field"><label>การนำงานไปเป็นตัวอย่าง</label><select name="sample_permission"><option value="">ยังไม่ระบุ</option><option>อนุญาต</option><option>ไม่อนุญาต</option><option>รอคำตอบ</option></select></div><div class="field"><label>ชื่อเครดิต</label><input name="credit"></div><div class="field full"><label>หมายเหตุ</label><textarea name="notes"></textarea></div>
+<div class="field full"><label>ความคืบหน้า</label><div class="checkrow"><label><input type="checkbox" name="sketch"> ร่าง (Sketch)</label><label><input type="checkbox" name="line"> เส้น (Line)</label><label><input type="checkbox" name="color"> สี (Coloring)</label></div></div>
+</div><div class="formactions"><button type="button" class="btn danger hidden" id="deleteJob">ลบรายการ</button><button type="button" class="btn" id="cancelEdit">ยกเลิก</button><button class="btn primary" type="submit">บันทึก</button></div></form><div id="editorMsg" class="status"></div></div></div>
+<div id="toast" class="status"></div>
+</main>
+<script>
+const $=id=>document.getElementById(id), fields=['month','client','contact','status','sketch','line','color','payment','type','scale','characters','price','paid','usage','sample_permission','credit','notes'];
+let client=null,jobs=[],editing=null;
+const money=n=>'฿'+Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:2});
+const val=x=>x===null||x===undefined||x===''?'—':String(x);
+const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function config(){return {url:localStorage.getItem('cs_url'),key:localStorage.getItem('cs_key')}}
+function show(id){['setup','login','workspace'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
+function message(id,t){$(id).textContent=t}
+async function connect(){const u=$('projectUrl').value.trim().replace(/\/$/,'');const k=$('anonKey').value.trim();if(!u||!k){message('setupMsg','กรุณากรอก URL และ anon/publishable key');return}try{new URL(u);localStorage.setItem('cs_url',u);localStorage.setItem('cs_key',k);client=window.supabase.createClient(u,k);const {error}=await client.auth.getSession();if(error)throw error;show('login');}catch(e){message('setupMsg','เชื่อมต่อไม่สำเร็จ: '+e.message)}}
+$('connect').onclick=connect;
+$('changeConfig').onclick=()=>{show('setup');const c=config();$('projectUrl').value=c.url||'';$('anonKey').value=c.key||''};
+$('settings').onclick=$('changeConfig').onclick;
+async function signIn(){message('loginMsg','กำลังเข้าสู่ระบบ…');const {error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){message('loginMsg',error.message);return}await loadJobs()}
+$('signIn').onclick=signIn;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});
+$('logout').onclick=async()=>{await client.auth.signOut();show('login')};
+async function loadJobs(){message('loginMsg','กำลังโหลดข้อมูล…');const {data,error}=await client.from('commissions').select('*').order('id',{ascending:false});if(error){show('login');message('loginMsg','โหลดข้อมูลไม่ได้: '+error.message+' · ตรวจสอบว่ารัน schema.sql แล้ว');return}jobs=data||[];show('workspace');render()}
+function statusClass(s){return s==='เสร็จสิ้น'?'done':s==='รอบรีฟงาน'?'revision':s==='กำลังดำเนินการ'?'working':''}
+function bar(label,n,total){const p=total?Math.round(n/total*100):0;return '<div class="metric"><span>'+safe(label)+'</span><b>'+n+'</b></div><div class="bar"><span style="width:'+p+'%"></span></div>'}
+function groupCount(key){const m={};jobs.forEach(j=>{const k=j[key]||'ยังไม่ระบุ';m[k]=(m[k]||0)+1});return m}
+function render(){const sum=k=>jobs.reduce((a,j)=>a+Number(j[k]||0),0);const missing=jobs.filter(j=>j.price==null).length;const over=jobs.filter(j=>j.price!=null&&Number(j.paid||0)>Number(j.price)).length;
+$('total').textContent=jobs.length;$('paidTotal').textContent=money(sum('paid'));$('priceTotal').textContent=money(sum('price'));$('missingTotal').textContent=missing;
+$('fPaid').textContent=money(sum('paid'));$('fPrice').textContent=money(sum('price'));$('fMissing').textContent=missing;$('fOver').textContent=over;
+const statuses=groupCount('status');$('statusSummary').innerHTML=Object.entries(statuses).map(([k,n])=>bar(k,n,jobs.length)).join('')||'<div class="empty">ยังไม่มีข้อมูล</div>';
+$('progressSummary').innerHTML=['sketch','line','color'].map((k,i)=>bar(['ร่าง','เส้น','สี'][i],jobs.filter(j=>j[k]===true).length,jobs.length)).join('');
+$('recent').innerHTML=jobs.slice(0,5).map(j=>'<div class="metric"><span>'+safe(j.client)+' · '+safe(j.month)+'</span><span class="tag '+statusClass(j.status)+'">'+safe(val(j.status))+'</span></div>').join('')||'<div class="empty">ยังไม่มีคิวงาน</div>';
+$('byType').innerHTML=Object.entries(groupCount('type')).map(([k,n])=>bar(k,n,jobs.length)).join('');
+$('byUsage').innerHTML=Object.entries(groupCount('usage')).map(([k,n])=>bar(k,n,jobs.length)).join('');
+$('byPayment').innerHTML=Object.entries(groupCount('payment')).map(([k,n])=>bar(k,n,jobs.length)).join('');
+$('byMonth').innerHTML=Object.entries(groupCount('month')).map(([k,n])=>bar(k,n,jobs.length)).join('');
+$('privateCount').textContent=jobs.filter(j=>j.usage==='ส่วนตัว').length;$('commercialCount').textContent=jobs.filter(j=>j.usage==='เชิงพาณิชย์').length;$('unknownUsage').textContent=jobs.filter(j=>!j.usage).length;$('unknownSample').textContent=jobs.filter(j=>!j.sample_permission).length;
+$('rightsRows').innerHTML=jobs.map(j=>'<div class="metric"><span>'+safe(j.client)+' · '+safe(j.month)+'</span><span>สิทธิ์: '+safe(val(j.usage))+' · ตัวอย่าง: '+safe(val(j.sample_permission))+'</span><button class="btn" onclick="editJob('+j.id+')">แก้ไข</button></div>').join('')||'<div class="empty">ยังไม่มีข้อมูล</div>';
+filterRows()}
+function filterRows(){const q=$('search').value.toLowerCase(),s=$('filterStatus').value,u=$('filterUsage').value;const list=jobs.filter(j=>(!s||j.status===s)&&(!u||(u==='__empty'?!j.usage:j.usage===u))&&(!q||fields.some(k=>String(j[k]??'').toLowerCase().includes(q))));$('rows').innerHTML=list.map(j=>'<tr><td>'+safe(val(j.month))+'</td><td>'+safe(val(j.client))+'</td><td>'+safe(val(j.contact))+'</td><td><span class="tag '+statusClass(j.status)+'">'+safe(val(j.status))+'</span></td><td>'+['sketch','line','color'].map(k=>j[k]?'●':'○').join(' ')+'</td><td>'+safe(val(j.payment))+'</td><td>'+safe(val(j.type))+'</td><td>'+safe(val(j.scale))+'</td><td>'+safe(val(j.characters))+'</td><td>'+safe(j.price==null?'—':money(j.price))+'</td><td>'+safe(j.paid==null?'—':money(j.paid))+'</td><td>'+safe(val(j.usage))+'</td><td>'+safe(val(j.sample_permission))+'</td><td>'+safe(val(j.credit))+'</td><td>'+safe(val(j.notes))+'</td><td><button class="btn" onclick="editJob('+j.id+')">แก้ไข</button></td></tr>').join('')||'<tr><td colspan="16" class="empty">ไม่พบรายการ</td></tr>'}
+$('search').oninput=filterRows;$('filterStatus').onchange=filterRows;$('filterUsage').onchange=filterRows;
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));document.querySelectorAll('[data-tab-link]').forEach(b=>b.onclick=()=>tab(b.dataset.tabLink));
+function tab(t){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===t))}
+function openEditor(j){editing=j?.id??null;$('editorTitle').textContent=editing?'แก้ไขคิวงาน':'เพิ่มคิวงาน';$('deleteJob').classList.toggle('hidden',!editing);$('jobForm').reset();fields.forEach(k=>{const el=$('jobForm').elements[k];if(!el)return;if(el.type==='checkbox')el.checked=!!j?.[k];else el.value=j?.[k]??''});$('editorMsg').textContent='';$('editor').classList.add('open')}
+window.editJob=id=>openEditor(jobs.find(j=>j.id===id));$('add').onclick=$('add2').onclick=()=>openEditor(null);$('closeEditor').onclick=$('cancelEdit').onclick=()=>$('editor').classList.remove('open');
+$('jobForm').onsubmit=async e=>{e.preventDefault();const data={};fields.forEach(k=>{const el=e.target.elements[k];if(el.type==='checkbox')data[k]=el.checked;else if(['characters','price','paid'].includes(k))data[k]=el.value===''?null:Number(el.value);else data[k]=el.value.trim()===''?null:el.value.trim()});$('editorMsg').textContent='กำลังบันทึก…';let req=editing?client.from('commissions').update(data).eq('id',editing):client.from('commissions').insert(data);const {error}=await req;if(error){$('editorMsg').textContent='บันทึกไม่สำเร็จ: '+error.message;return}$('editor').classList.remove('open');await loadJobs()};
+$('deleteJob').onclick=async()=>{if(!editing||!confirm('ยืนยันลบรายการนี้?'))return;const {error}=await client.from('commissions').delete().eq('id',editing);if(error){$('editorMsg').textContent=error.message;return}$('editor').classList.remove('open');await loadJobs()};
+async function init(){const c=config();if(!c.url||!c.key){show('setup');return}$('projectUrl').value=c.url;$('anonKey').value=c.key;client=window.supabase.createClient(c.url,c.key);const {data,error}=await client.auth.getSession();if(error){show('setup');message('setupMsg',error.message);return}if(data.session)await loadJobs();else show('login')}
+init();
+</script></body></html>
